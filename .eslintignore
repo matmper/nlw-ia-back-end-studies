@@ -1,0 +1,4 @@
+docs/**
+prisma/**
+docker/**
+node_modules/**

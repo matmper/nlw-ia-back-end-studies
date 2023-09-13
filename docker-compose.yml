@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+
+    # Node 18
+    nfw-ia-node:
+        container_name: nfw-ia-node-18
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile
+        env_file: .env
+        tty: true
+        restart: unless-stopped
+        ports:
+            - "${APP_EXTERNAL_PORT:-3333}:${APP_PORT:-3333}"
+            - "9229:9229"
+        volumes:
+            - ./:/usr/src/app
+        networks:
+            - nfw-ia-network
+
+    # DB - MySQL 8.0
+    nfw-ia-mysql:
+        image: mysql/mysql-server:8.0.23
+        container_name: nfw-ia-mysql-8
+        tty: true
+        command:
+            - --default-authentication-plugin=mysql_native_password
+            - --explicit_defaults_for_timestamp
+        ports:
+            - "${DB_EXTERNAL_PORT:-3306}:3306"
+        environment:
+            MYSQL_DATABASE: ${DB_NAME}
+            MYSQL_ROOT_PASSWORD: ${DB_PASS}
+            MYSQL_ROOT_HOST: '%'
+        volumes:
+            - nfw-ia-database:/var/lib/mysql
+            - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+        networks:
+            - nfw-ia-network
+
+#Docker Networks
+networks:
+    nfw-ia-network:
+        driver: bridge
+
+#Volumes
+volumes:
+    nfw-ia-database:
+        driver: local

@@ -1,0 +1,9 @@
+/node_modules
+/docker
+.env.example
+.gitignore
+docker-compose.yml
+LICENSE
+Makefile
+README.md
+yarn.lock
