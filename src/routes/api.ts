@@ -1,32 +1,48 @@
-import { FastifyInstance } from 'fastify';
-import { PromptController } from '../controllers/promptController';
-import { PageController } from '../controllers/pageController';
-import { fastifySwagger } from '@fastify/swagger';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { PromptController } from '../controllers/prompt.controller';
+import { PageController } from '../controllers/page.controller';
+import { VideoController } from '../controllers/video.controller';
+import TResponse from '../types/response.type';
+import { AiController } from '../controllers/ai.controller';
 
 export async function getApiRoutes(app: FastifyInstance) {
-  await app.register(fastifySwagger, {
-    swagger: {
-      info: {
-        title: 'NFW IA 2023 - API',
-        version: '1.0.0',
-      },
-      host: process.env.APP_HOST || '0.0.0.0',
-      schemes: ['http'],
-      consumes: ['application/json'],
-      produces: ['application/json'],
-      securityDefinitions: {
-        apiKey: { type: 'apiKey', name: 'apiKey', in: 'header' },
-      },
-    },
-  });
-
-  app.get('/', async () => {
+  app.get('/', async (
+    request: FastifyRequest,
+    reply: FastifyReply
+  ): Promise<TResponse> => {
     const pageController = new PageController();
-    return await pageController.index();
+    return await pageController.index(request, reply);
   });
 
-  app.get('/prompts', async () => {
-    const promptController = new PromptController();
-    return await promptController.index();
+  app.get('/prompts', async (
+    request: FastifyRequest,
+    reply: FastifyReply
+  ): Promise<TResponse> => {
+    const promptController = new PromptController
+    return await promptController.index(request, reply);
+  });
+
+  app.post('/videos', async (
+    request: FastifyRequest,
+    reply: FastifyReply
+  ): Promise<TResponse> => {
+    const videoController = new VideoController
+    return await videoController.store(request, reply);
+  });
+
+  app.post('/videos/:videoId/transcription', async (
+    request: FastifyRequest,
+    reply: FastifyReply
+  ): Promise<TResponse> => {
+    const videoController = new VideoController
+    return await videoController.transcription(request, reply);
+  });
+
+  app.post('/ai/:videoId/generate', async (
+    request: FastifyRequest,
+    reply: FastifyReply
+  ): Promise<TResponse> => {
+    const aiController = new AiController
+    return await aiController.generate(request, reply);
   });
 }

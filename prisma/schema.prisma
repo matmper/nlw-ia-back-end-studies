@@ -12,11 +12,12 @@ datasource db {
 
 // Application Model: Video
 model Video {
-  id            String   @id @default(uuid())
+  id            String        @id @default(uuid())
   name          String
   path          String
-  transcription String?
-  createdAt     DateTime @default(now())
+  transcription String?       @db.LongText
+  createdAt     DateTime      @default(now())
+  PromptVideo   PromptVideo[]
 }
 
 // Application Model: Prompt
@@ -25,4 +26,16 @@ model Prompt {
   title     String
   template  String
   createdAt DateTime @default(now())
+}
+
+// Generated Prompt
+model PromptVideo {
+  id         String   @id @default(uuid())
+  video      Video    @relation(fields: [videoId], references: [id])
+  videoId    String
+  externalId String
+  model      String
+  prompt     String   @db.LongText
+  response   Json
+  createdAt  DateTime @default(now())
 }
